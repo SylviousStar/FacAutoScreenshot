@@ -328,7 +328,7 @@ end
 --  #region value changed handlers
 function handlers.auto_zoom_slider_value_changed(event)
     log(l.info("auto zoom slider was moved"))
-    local level = math.pow(2, event.element.slider_value)
+    local level = event.element.slider_value
     storage.gui[event.player_index].auto_zoom_value.text = tostring(level)
     storage.auto[event.player_index].manualZoomLevel = level
     shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel

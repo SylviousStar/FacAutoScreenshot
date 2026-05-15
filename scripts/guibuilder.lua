@@ -184,9 +184,9 @@ local function buildAutoZoom(index, auto_screenshot_config)
     storage.gui[index].auto_zoom_slider = auto_zoom_flow.add{
         type = "slider",
         name = "auto_zoom_slider",
-        minimum_value = "-3",
-        maximum_value = "5",
-        value = math.log(storage.auto[index].manualZoomLevel)/math.log(2),
+        minimum_value = "1",
+        maximum_value = "32",
+        value = storage.auto[index].manualZoomLevel,
         style = "fas_slider"
     }
     storage.gui[index].auto_zoom_value = auto_zoom_flow.add{

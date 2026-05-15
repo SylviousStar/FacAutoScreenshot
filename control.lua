@@ -21,6 +21,9 @@ local function loadDefaultsForPlayer(index)
         storage.auto[index].zoomLevel = {}
     end
 
+    if storage.auto[index].hideClouds == nil then storage.auto[index].hideClouds = false end
+    log(l.info("hideClouds is " .. (storage.auto[index].hideClouds and "on" or "off")))
+
     if storage.auto[index].manualZoom == nil then storage.auto[index].manualZoom = false end
     log(l.info("manualZoom is " .. (storage.auto[index].manualZoom and "on" or "off")))
 
@@ -240,6 +243,12 @@ function handlers.surface_checkbox_click(event)
     end
     queue.refreshNextScreenshotTimestamp()
     gui.refreshStatusCountdown()
+end
+
+function handlers.auto_clouds_value_click(event)
+    log(l.info(("auto clouds value was changed for player " .. event.player_index)))
+    local doesSingle = event.element.state
+    storage.auto[event.player_index].hideClouds = doesSingle
 end
 
 function handlers.auto_zoom_check_value_click(event)

@@ -105,7 +105,9 @@ function shooter.renderAutoSingleScreenshot(index, specs)
 		daytime = 0,
 		water_tick = 0,
 		by_player = index,
-		path = buildPath("auto_singleTick_" .. specs.surface .. "/", "screenshot" .. game.tick, ".png")
+		path = buildPath("auto_singleTick_" .. specs.surface .. "/", "screenshot" .. game.tick, ".png"),
+		hide_clouds = specs.hideClouds --,
+		-- hide_fog = true
 	}
 end
 
@@ -128,7 +130,8 @@ function shooter.renderAutoScreenshotFragment(index, fragment)
 		by_player = index,
 		water_tick = 0,
 		daytime = 0,
-		path = buildPath("auto_split_" .. fragment.surface .. "/", fragment.title .. "_x" .. fragment.offset.x .. "_y" .. fragment.offset.y, ".png")
+		path = buildPath("auto_split_" .. fragment.surface .. "/", fragment.title .. "_x" .. fragment.offset.x .. "_y" .. fragment.offset.y, ".png"),
+		hide_clouds = specs.hideClouds
 	}
 
 	-- the first screenshot is the screenshot 0 0, therefore +1

@@ -142,6 +142,28 @@ local function buildAutoSurface(index, auto_content)
     end
 end
 
+local function buildAutoClouds(index, auto_screenshot_config)
+    local auto_clouds_flow = auto_screenshot_config.add{
+        type = "flow",
+        name = "auto_clouds_flow",
+        direction = "horizontal",
+        style = "fas_flow"
+    }
+
+    auto_clouds_flow.add{
+        type = "label",
+        name = "auto_clouds_label",
+        caption = {"FAS-auto-clouds-caption"},
+        style = "fas_label"
+    }
+
+    storage.gui[index].auto_clouds_value = auto_clouds_flow.add{
+        type = "checkbox",
+        name = "auto_clouds_value",
+        state = storage.auto[index].hideClouds and false
+    }
+end
+
 local function buildAutoZoomCheck(index, auto_screenshot_config)
     local auto_zoom_check_flow = auto_screenshot_config.add{
         type = "flow",
@@ -328,6 +350,7 @@ local function buildAutoScreenshotSection(index, auto_frame)
 
     buildAutoStatus(index, auto_content)
     buildAutoSurface(index, auto_content)
+    buildAutoClouds(index, auto_content)
     buildAutoZoomCheck(index, auto_content)
     buildAutoZoom(index, auto_content)
     buildAutoResolution(index, auto_content)

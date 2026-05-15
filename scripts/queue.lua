@@ -48,7 +48,8 @@ local function registerPlayerSingleScreenshots(index)
 				surface = surface.name,
 				resX = storage.auto[index].resX,
 				resY = storage.auto[index].resY,
-				zoom = storage.auto[index].zoom[surface.name]
+				zoom = storage.auto[index].zoom[surface.name],
+				hideClouds = storage.auto[index].hideClouds
 			}
 		end
 	end
@@ -79,7 +80,8 @@ local function registerPlayerFragmentedScreenshots(index)
 				startpos = { x = -rightborder + posXStepsize / 2, y = -bottomborder + posYStepsize / 2 },
 				stepsize = { x = posXStepsize, y = posYStepsize },
 				zoom = zoom,
-				title = "screenshot" .. game.tick
+				title = "screenshot" .. game.tick,
+				hideClouds = storage.auto[index].hideClouds
 			}
 
 			if l.doD then log(l.debug("surface:    " .. fragment["surface"])) end

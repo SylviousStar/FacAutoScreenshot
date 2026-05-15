@@ -21,6 +21,18 @@ local function evaluateZoomForPlayer(index, surface)
 	if not storage.auto[index].zoom[surface] then storage.auto[index].zoom[surface] = 1 end
 	if not storage.auto[index].zoomLevel[surface] then storage.auto[index].zoomLevel[surface] = 1 end
 
+	if storage.auto[index].manualZoom then
+		storage.auto[index].zoomLevel[surface] = storage.auto[index].manualZoomLevel
+		storage.auto[index].zoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
+		log(l.info("Adjusting zoom for player " ..
+		index ..
+		" on surface " ..
+		surface ..
+		" to " .. storage.auto[index].zoom[surface] .. " and zoomlevel to " .. storage.auto[index].zoomLevel[surface] ..
+		" (Manual zoom)"))
+		return
+	end
+
 	-- 7680					storage.auto.resX
 	-- -------- = 0,3		------------------ = zoom
 	-- 800  32				leftRight resTiles

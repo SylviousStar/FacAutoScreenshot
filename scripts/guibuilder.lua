@@ -142,6 +142,64 @@ local function buildAutoSurface(index, auto_content)
     end
 end
 
+local function buildAutoZoomCheck(index, auto_screenshot_config)
+    local auto_zoom_check_flow = auto_screenshot_config.add{
+        type = "flow",
+        name = "auto_zoom_check_flow",
+        direction = "horizontal",
+        style = "fas_flow"
+    }
+
+    auto_zoom_check_flow.add{
+        type = "label",
+        name = "auto_zoom_check_label",
+        caption = {"FAS-auto-zoom-check-caption"},
+        style = "fas_label"
+    }
+
+    storage.gui[index].auto_zoom_check_value = auto_zoom_check_flow.add{
+        type = "checkbox",
+        name = "auto_zoom_check_value",
+        state = storage.auto[index].manualZoom or false
+    }
+end
+
+local function buildAutoZoom(index, auto_screenshot_config)
+    local auto_zoom_flow = auto_screenshot_config.add{
+        type = "flow",
+        name = "auto_zoom_flow",
+        direction = "horizontal",
+        style = "fas_flow",
+        visible = storage.auto[index].manualZoom
+    }
+    storage.gui[index].auto_zoom_flow = auto_zoom_flow
+
+    auto_zoom_flow.add{
+        type = "label",
+        name = "zoom_label",
+        caption = {"FAS-auto-zoom-label-caption"},
+        tooltip = {"FAS-auto-zoom-label-tooltip"},
+        style = "fas_label"
+    }
+    storage.gui[index].auto_zoom_slider = auto_zoom_flow.add{
+        type = "slider",
+        name = "auto_zoom_slider",
+        minimum_value = "-3",
+        maximum_value = "5",
+        value = math.log(storage.auto[index].manualZoomLevel)/math.log(2),
+        style = "fas_slider"
+    }
+    storage.gui[index].auto_zoom_value = auto_zoom_flow.add{
+        type = "textfield",
+        name = "auto_zoom_value",
+        text = storage.auto[index].manualZoomLevel,
+        numeric = "true",
+        allow_decimal = "true",
+        enabled = "false",
+        style = "fas_slim_numeric_output"
+    }
+end
+
 local function buildAutoResolution(index, auto_screenshot_config)
     local resolution_flow = auto_screenshot_config.add {
         type = "flow",
@@ -270,6 +328,8 @@ local function buildAutoScreenshotSection(index, auto_frame)
 
     buildAutoStatus(index, auto_content)
     buildAutoSurface(index, auto_content)
+    buildAutoZoomCheck(index, auto_content)
+    buildAutoZoom(index, auto_content)
     buildAutoResolution(index, auto_content)
     buildAutoInterval(index, auto_content)
     buildAutoSingleTick(index, auto_content)

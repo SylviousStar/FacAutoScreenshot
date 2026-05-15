@@ -21,6 +21,12 @@ local function loadDefaultsForPlayer(index)
         storage.auto[index].zoomLevel = {}
     end
 
+    if storage.auto[index].manualZoom == nil then storage.auto[index].manualZoom = false end
+    log(l.info("manualZoom is " .. (storage.auto[index].manualZoom and "on" or "off")))
+
+    if not storage.auto[index].manualZoomLevel then storage.auto[index].manualZoomLevel = 1 end
+    log(l.info("storage.auto.manualZoomLevel is " .. storage.auto[index].manualZoomLevel))
+
     if storage.auto[index].interval == nil then storage.auto[index].interval = 10 * 60 * 60 end
     log(l.info("interval is " .. (storage.auto[index].interval / 60 / 60)) .. " min")
 
@@ -223,6 +229,7 @@ function handlers.auto_content_collapse_click(event)
     gui.toggle_auto_content_area(event.player_index)
 end
 
+-- TODO: have a list of zoom leveles for different surfaces
 function handlers.surface_checkbox_click(event)
     log(l.info("surface_checkbox was triggered for player " .. event.player_index))
     storage.auto[event.player_index].doSurface[event.element.caption] = event.element.state
@@ -233,6 +240,13 @@ function handlers.surface_checkbox_click(event)
     end
     queue.refreshNextScreenshotTimestamp()
     gui.refreshStatusCountdown()
+end
+
+function handlers.auto_zoom_check_value_click(event)
+    log(l.info(("auto zoom check value was changed for player " .. event.player_index)))
+    local doesSingle = event.element.state
+    storage.auto[event.player_index].manualZoom = not doesSingle
+    storage.gui[event.player_index].auto_zoom_flow.visible = not doesSingle
 end
 
 function handlers.single_tick_value_click(event)
@@ -312,6 +326,14 @@ end
 --  #endregion click handlers
 
 --  #region value changed handlers
+function handlers.auto_zoom_slider_value_changed(event)
+    log(l.info("auto zoom slider was moved"))
+    local level = math.pow(2, event.element.slider_value)
+    storage.gui[event.player_index].auto_zoom_value.text = tostring(level)
+    storage.auto[event.player_index].manualZoomLevel = level
+    shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel
+end
+
 function handlers.splitting_factor_slider_value_changed(event)
     log(l.info("splitting factor was changed for player " .. event.player_index))
     local splittingFactor = math.pow(4, event.element.slider_value)

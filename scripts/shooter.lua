@@ -106,8 +106,8 @@ function shooter.renderAutoSingleScreenshot(index, specs)
 		water_tick = 0,
 		by_player = index,
 		path = buildPath("auto_singleTick_" .. specs.surface .. "/", "screenshot" .. game.tick, ".png"),
-		hide_clouds = specs.hideClouds --,
-		-- hide_fog = true
+		hide_clouds = settings.get_player_settings(index)["Hide-clouds"].value,
+		hide_fog = settings.get_player_settings(index)["Hide-fog"].value
 	}
 end
 
@@ -131,7 +131,8 @@ function shooter.renderAutoScreenshotFragment(index, fragment)
 		water_tick = 0,
 		daytime = 0,
 		path = buildPath("auto_split_" .. fragment.surface .. "/", fragment.title .. "_x" .. fragment.offset.x .. "_y" .. fragment.offset.y, ".png"),
-		hide_clouds = specs.hideClouds
+		hide_clouds = settings.get_player_settings(index)["Hide-clouds"].value,
+		hide_fog = settings.get_player_settings(index)["Hide-fog"].value
 	}
 
 	-- the first screenshot is the screenshot 0 0, therefore +1
@@ -197,7 +198,9 @@ function shooter.renderAreaScreenshot(index)
 		show_cursor_building_preview = storage.snip[index].showCursorBuildingPreview,
 		anti_allias = storage.snip[index].useAntiAlias,
 		daytime = dstate,
-		quality = storage.snip[index].jpg_quality
+		quality = storage.snip[index].jpg_quality,
+		hide_clouds = settings.get_player_settings(index)["Hide-clouds"].value,
+		hide_fog = settings.get_player_settings(index)["Hide-fog"].value
 	}
 	game.get_player(index).print({ "FAS-did-screenshot", path })
 end

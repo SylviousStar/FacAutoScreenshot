@@ -160,7 +160,7 @@ local function buildAutoZoomCheck(index, auto_screenshot_config)
     storage.gui[index].auto_zoom_check_value = auto_zoom_check_flow.add{
         type = "checkbox",
         name = "auto_zoom_check_value",
-        state = storage.auto[index].manualZoom or false
+        state = not (storage.auto[index].manualZoom and false)
     }
 end
 

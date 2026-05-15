@@ -124,7 +124,7 @@ local function on_init(event)
 end
 
 local function on_configuration_changed(event)
-    if event.mod_changes.FacAutoScreenshot then
+    if event.mod_changes.FacAutoScreenshot_Updated then
         log(l.info("configuration of FAS changed"))
         initialize()
     end

@@ -160,8 +160,8 @@ local function buildAutoZoomCheck(index, auto_screenshot_config)
     storage.gui[index].auto_zoom_check_value = auto_zoom_check_flow.add{
         type = "checkbox",
         name = "auto_zoom_check_value",
-        state = not (storage.auto[index].manualZoom and false)
-    }
+        state = storage.auto[index].autoZoom or false
+    } -- TODO: Change this to say enable manual zoom levels, since each surface will have its own checkbox
 end
 
 local function buildAutoZoom(index, auto_screenshot_config)
@@ -170,7 +170,7 @@ local function buildAutoZoom(index, auto_screenshot_config)
         name = "auto_zoom_flow",
         direction = "horizontal",
         style = "fas_flow",
-        visible = storage.auto[index].manualZoom
+        -- visible = not storage.auto[index].autoZoom
     }
     storage.gui[index].auto_zoom_flow = auto_zoom_flow
 
@@ -186,13 +186,14 @@ local function buildAutoZoom(index, auto_screenshot_config)
         name = "auto_zoom_slider",
         minimum_value = "1",
         maximum_value = "32",
-        value = storage.auto[index].manualZoomLevel,
+        value = storage.auto[index].zoomLevel["nauvis"], -- TODO: Add a list for different surfaces
+        enabled = not storage.auto[index].autoZoom,
         style = "fas_slider"
     }
     storage.gui[index].auto_zoom_value = auto_zoom_flow.add{
         type = "textfield",
         name = "auto_zoom_value",
-        text = storage.auto[index].manualZoomLevel,
+        text = tostring(storage.auto[index].zoomLevel["nauvis"]), -- TODO: Add a list for different surfaces
         numeric = "true",
         allow_decimal = "true",
         enabled = "false",

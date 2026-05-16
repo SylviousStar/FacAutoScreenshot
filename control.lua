@@ -20,12 +20,21 @@ local function loadDefaultsForPlayer(index)
         l.info("storage.auto.zoomlevel was nil")
         storage.auto[index].zoomLevel = {}
     end
+    -- if not storage.auto[index].autoZoom then
+    --     l.info("storage.auto.autoZoom was nil")
+    --     storage.auto[index].autoZoom = {}
+    -- end
+    if not storage.auto[index].autoZoomLevel then
+        l.info("storage.auto.autoZoomLevel was nil")
+        storage.auto[index].autoZoomLevel = {}
+    end
+    -- TODO: initialize manualZoomLevel list
 
-    if storage.auto[index].manualZoom == nil then storage.auto[index].manualZoom = false end
-    log(l.info("manualZoom is " .. (storage.auto[index].manualZoom and "on" or "off")))
+    if storage.auto[index].autoZoom == nil then storage.auto[index].autoZoom = true end
+    log(l.info("autoZoom is " .. (storage.auto[index].autoZoom and "on" or "off")))
 
-    if not storage.auto[index].manualZoomLevel then storage.auto[index].manualZoomLevel = 1 end
-    log(l.info("storage.auto.manualZoomLevel is " .. storage.auto[index].manualZoomLevel))
+    -- if not storage.auto[index].autoZoomLevel then storage.auto[index].autoZoomLevel = 1 end
+    -- log(l.info("storage.auto.autoZoomLevel is " .. storage.auto[index].autoZoomLevel))
 
     if storage.auto[index].interval == nil then storage.auto[index].interval = 10 * 60 * 60 end
     log(l.info("interval is " .. (storage.auto[index].interval / 60 / 60)) .. " min")
@@ -244,9 +253,15 @@ end
 
 function handlers.auto_zoom_check_value_click(event)
     log(l.info(("auto zoom check value was changed for player " .. event.player_index)))
-    local doesSingle = event.element.state
-    storage.auto[event.player_index].manualZoom = not doesSingle
-    storage.gui[event.player_index].auto_zoom_flow.visible = not doesSingle
+    local autoZoom = event.element.state
+    storage.auto[event.player_index].autoZoom = autoZoom
+    -- storage.gui[event.player_index].auto_zoom_flow.visible = not autoZoom
+    storage.gui[event.player_index].auto_zoom_slider.enabled = not autoZoom -- TODO:change this to showing the list
+    if autoZoom then 
+        if l.doD then log(l.debug("Reevaluating autoZoomLevel due to button click")) end
+        basetracker.checkForMinMaxChange() -- this is used as a condition below, but it simultaneously updates minmax so shooter can reevaluate
+        shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) 
+    end
 end
 
 function handlers.single_tick_value_click(event)
@@ -330,7 +345,8 @@ function handlers.auto_zoom_slider_value_changed(event)
     log(l.info("auto zoom slider was moved"))
     local level = event.element.slider_value
     storage.gui[event.player_index].auto_zoom_value.text = tostring(level)
-    storage.auto[event.player_index].manualZoomLevel = level
+    -- storage.auto[event.player_index].manualZoomLevel = level
+    storage.auto[event.player_index].zoomLevel["nauvis"] = level -- TODO: change this to a loop for each surface
     shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel
 end
 
@@ -414,6 +430,9 @@ function handlers.auto_resolution_value_selection(event)
     end
     storage.auto[event.player_index].zoom = {}
     storage.auto[event.player_index].zoomLevel = {}
+    storage.auto[event.player_index].autoZoomLevel = {} -- zoom level is reset here, so autoZoom needs to be reset too or zoom will take its value and not be able to drop down
+    -- this was not an issue when switching between auto and manual bceause auto zoom always increases, except here when resolution changes
+    basetracker.checkForMinMaxChange()
     shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index)
 end
 

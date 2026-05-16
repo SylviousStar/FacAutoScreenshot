@@ -20,9 +20,20 @@ local function evaluateZoomForPlayer(index, surface)
 
 	if not storage.auto[index].zoom[surface] then storage.auto[index].zoom[surface] = 1 end
 	if not storage.auto[index].zoomLevel[surface] then storage.auto[index].zoomLevel[surface] = 1 end
+	-- if not storage.auto[index].autoZoom[surface] then storage.auto[index].autoZoom[surface] = 1 end
+	if not storage.auto[index].autoZoomLevel[surface] then storage.auto[index].autoZoomLevel[surface] = 1 end
 
-	if storage.auto[index].manualZoom then
-		storage.auto[index].zoomLevel[surface] = storage.auto[index].manualZoomLevel
+	if storage.auto[index].autoZoom then
+		-- restore auto zoom level if using auto zoom, should be same as zoom level unless manual zoom is activated
+		storage.auto[index].zoomLevel[surface] = storage.auto[index].autoZoomLevel[surface]
+		storage.auto[index].zoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
+		log(l.info("Adjusting zoom for player " ..
+		index ..
+		" on surface " ..
+		surface ..
+		" to " .. storage.auto[index].zoom[surface] .. " and zoomlevel to " .. storage.auto[index].zoomLevel[surface]))
+	else 
+		-- storage.auto[index].zoomLevel[surface] = storage.auto[index].manualZoomLevel
 		storage.auto[index].zoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
 		log(l.info("Adjusting zoom for player " ..
 		index ..
@@ -63,6 +74,18 @@ local function evaluateZoomForPlayer(index, surface)
 			index ..
 			" reached maximum zoom level of 32. No further zooming out possible. Entities exceeding the screenshot limits will not be shown on the screenshots!")
 		end
+	end
+
+	if storage.auto[index].autoZoom then
+		-- store auto calculated zoom level to be retored if manual zoom is deactivated
+		storage.auto[index].autoZoomLevel[surface] = storage.auto[index].zoomLevel[surface]
+		-- storage.auto[index].autoZoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
+	end
+
+	if storage.gui[index] then
+		-- Update gui to reflect latest auto zoom level, only runs if manual zoom is disabled
+		storage.gui[index].auto_zoom_value.text = tostring(storage.auto[index].zoomLevel[surface]) -- TODO: Change this to lists
+		storage.gui[index].auto_zoom_slider.slider_value = storage.auto[index].zoomLevel[surface]
 	end
 end
 

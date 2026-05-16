@@ -294,8 +294,10 @@ end
 function handlers.surface_zoom_toggle_click(event)
     local surfaceZoomToggle = event.element.state
     local surfacename = string.gsub(event.element.name,"surface_zoom_toggle_","")
+    -- log(l.debug(event.element.name))
+    -- log(l.debug(surfacename))
     storage.auto[event.player_index].surfaceZoomToggle[surfacename] = surfaceZoomToggle
-    log(l.info((surfacename .. "surface zoom toggle was changed for player " .. event.player_index)))
+    log(l.info(("surface zoom toggle was changed for player " .. event.player_index .. " on " .. surfacename)))
     -- storage.auto[event.player_index].autoZoomToggle = autoZoomToggle
     -- storage.gui[event.player_index].auto_zoom_flow.visible = not autoZoomToggle
     -- for _, surface in pairs(game.surfaces) do
@@ -308,10 +310,14 @@ function handlers.surface_zoom_toggle_click(event)
     storage.gui[event.player_index]["surface_zoom_slider_" .. surfacename].enabled = surfaceZoomToggle
 
     if surfaceZoomToggle then
+        -- log(l.debug("manual zoom on"))
+        -- log(l.debug(surfacename))
         storage.auto[event.player_index].manualZoomLevel[surfacename] = storage.auto[event.player_index].zoomLevel[surfacename] -- set manualZoomLevel to the current zoom level
         -- storage.auto[event.player_index].manualZoomLevel[surface] = nil
     else
-        if l.doD then log(l.debug("Reevaluating autoZoomLevel due to button click")) end
+        -- log(l.debug("auto zoom on"))
+        -- log(l.debug(surfacename))
+        if l.doD then log(l.info("reevaluating zoom from autoZoom toggled on")) end
         basetracker.checkForMinMaxChange() -- this is used as a condition below, but it simultaneously updates minmax so shooter can reevaluate
         shooter.evaluateZoomForPlayer(event.player_index, surfacename) -- recalculate zoomLevel based on autoZoomLevel and update gui
         -- autoZoomLevel does not need to be reset as it is never manually overridden
@@ -419,15 +425,19 @@ end
 -- end
 
 function handlers.surface_zoom_slider_changed(event)
-    log(l.info(event.element.name .. "was moved"))
+    log(l.info(event.element.name .. " was moved"))
     local level = event.element.slider_value
     -- local surfacename = string.gsub(event.element.name,"surface_zoom_slider_","")
     local surfacename = event.element.caption
+    -- log(l.debug(event.element.name))
+    -- log(l.debug(event.element.caption))
+    -- log(l.debug(surfacename))
     -- storage.gui[event.player_index]["surface_zoom_value_" .. surfacename].text = tostring(level)
     storage.gui[event.player_index]["surface_zoom_label_" .. surfacename].caption = tostring(level)
     storage.auto[event.player_index].manualZoomLevel[surfacename] = level
     -- storage.auto[event.player_index].zoomLevel[surfacename] = level
     -- shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel
+    log(l.info("reevaluating zoom from slider"))
     shooter.evaluateZoomForPlayer(event.player_index, surfacename)
 end
 

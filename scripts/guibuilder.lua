@@ -124,7 +124,7 @@ local function addListitem(index, list, surfacename)
     storage.gui[index]["surface_zoom_slider_" .. surfacename] = list_item.add {
         type = "slider",
         name = "surface_zoom_slider_" .. surfacename,
-        caption = tostring(storage.auto[index].zoomLevel[surfacename]),
+        caption = surfacename,
         tooltip = { "FAS-auto-zoom-label-tooltip" },
         minimum_value = "1",
         maximum_value = "32",

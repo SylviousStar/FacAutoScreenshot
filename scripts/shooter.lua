@@ -24,7 +24,9 @@ function shooter.evaluateZoomForPlayer(index, surface)
 	if not storage.auto[index].autoZoomLevel[surface] then storage.auto[index].autoZoomLevel[surface] = storage.auto[index].zoomLevel[surface] end
 	if not storage.auto[index].manualZoomLevel[surface] then storage.auto[index].manualZoomLevel[surface] = storage.auto[index].zoomLevel[surface] end
 
-	if not storage.auto[index].surfaceZoomToggle[surfacename] then
+	if not storage.auto[index].surfaceZoomToggle[surface] then
+		-- log(l.debug(index))
+		-- log(l.debug(surface))
 		-- restore auto zoom level if using auto zoom, should be same as zoom level unless manual zoom is activated
 		storage.auto[index].zoomLevel[surface] = storage.auto[index].autoZoomLevel[surface]
 		storage.auto[index].zoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
@@ -32,8 +34,11 @@ function shooter.evaluateZoomForPlayer(index, surface)
 		index ..
 		" on surface " ..
 		surface ..
-		" to " .. storage.auto[index].zoom[surface] .. " and zoomlevel to " .. storage.auto[index].zoomLevel[surface]))
+		" to " .. storage.auto[index].zoom[surface] .. " and zoomlevel to " .. storage.auto[index].zoomLevel[surface] ..
+		" (Auto zoom)"))
 	else 
+		-- log(l.debug(index))
+		-- log(l.debug(surface))
 		storage.auto[index].zoomLevel[surface] = storage.auto[index].manualZoomLevel[surface]
 		storage.auto[index].zoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
 		log(l.info("Adjusting zoom for player " ..
@@ -77,7 +82,7 @@ function shooter.evaluateZoomForPlayer(index, surface)
 		end
 	end
 
-	if not not storage.auto[index].surfaceZoomToggle[surfacename] then
+	if not not storage.auto[index].surfaceZoomToggle[surface] then
 		-- store auto calculated zoom level to be retored if manual zoom is deactivated
 		storage.auto[index].autoZoomLevel[surface] = storage.auto[index].zoomLevel[surface]
 		-- storage.auto[index].autoZoom[surface] = 1 / storage.auto[index].zoomLevel[surface]

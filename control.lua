@@ -251,6 +251,11 @@ function handlers.auto_content_collapse_click(event)
     gui.toggle_auto_content_area(event.player_index)
 end
 
+function handlers.shoot_now_button_click(event)
+    log(l.info("shoot auto screenshot now by player " .. event.player_index))
+    queue.registerPlayerToQueue(event.player_index)
+end
+
 function handlers.surface_checkbox_click(event)
     log(l.info("surface_checkbox was triggered for player " .. event.player_index))
     local surfacename = event.element.caption

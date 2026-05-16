@@ -88,6 +88,13 @@ local function buildAutoStatus(index, auto_content)
     }
     progressbar.style.width = 334
     storage.gui[index].progress_bar = progressbar
+
+    status_flow.add {
+        type = "button",
+        name = "shoot_now_button",
+        caption = { "FAS-shoot-now-button-caption" },
+        mouse_button_filter = { "left" }
+    }
 end
 
 local function addListitem(index, list, surfacename)
@@ -207,7 +214,7 @@ local function buildAutoZoomToggle(index, auto_screenshot_config)
         type = "checkbox",
         name = "auto_zoom_toggle_value",
         state = storage.auto[index].autoZoomToggle or false
-    } -- TODO: Change this to say enable manual zoom levels, since each surface will have its own checkbox
+    }
 end
 
 -- local function buildAutoZoom(index, auto_screenshot_config)

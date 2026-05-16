@@ -253,12 +253,14 @@ end
 
 function handlers.surface_checkbox_click(event)
     log(l.info("surface_checkbox was triggered for player " .. event.player_index))
-    storage.auto[event.player_index].doSurface[event.element.caption] = event.element.state
+    local surfacename = event.element.caption
+    storage.auto[event.player_index].doSurface[surfacename] = event.element.state
     
-    visible = storage.auto[event.player_index].autoZoomToggle and storage.auto[event.player_index].doSurface[event.element.caption]
-    storage.gui[event.player_index]["surface_zoom_toggle_" .. event.element.caption].visible = visible
-    storage.gui[event.player_index]["surface_zoom_slider_" .. event.element.caption].visible = visible
-    storage.gui[event.player_index]["surface_zoom_value_" .. event.element.caption].visible = visible
+    local visible = storage.auto[event.player_index].autoZoomToggle and storage.auto[event.player_index].doSurface[surfacename]
+    storage.gui[event.player_index]["surface_zoom_toggle_" .. surfacename].visible = visible
+    storage.gui[event.player_index]["surface_zoom_slider_" .. surfacename].visible = visible
+    -- storage.gui[event.player_index]["surface_zoom_value_" .. event.element.caption].visible = visible
+    storage.gui[event.player_index]["surface_zoom_label_" .. surfacename].visible = visible
 
     if storage.auto[event.player_index].zoomLevel[event.element.caption] == nil then
         if l.doD then log(l.debug("Zoomlevel was nil when changing surface selection")) end
@@ -274,11 +276,12 @@ function handlers.auto_zoom_toggle_value_click(event)
     storage.auto[event.player_index].autoZoomToggle = autoZoomToggle
     -- storage.gui[event.player_index].auto_zoom_flow.visible = not autoZoomToggle
     for _, surface in pairs(game.surfaces) do
-        surfaceToggle = storage.auto[event.player_index].doSurface[surface.name] or false
+        local surfaceToggle = storage.auto[event.player_index].doSurface[surface.name] or false
         -- storage.gui[event.player_index]["surface_zoom_listitem_" .. surface.name].visible = autoZoomToggle and surfaceToggle
         storage.gui[event.player_index]["surface_zoom_toggle_" .. surface.name].visible = autoZoomToggle and surfaceToggle
         storage.gui[event.player_index]["surface_zoom_slider_" .. surface.name].visible = autoZoomToggle and surfaceToggle
-        storage.gui[event.player_index]["surface_zoom_value_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+        -- storage.gui[event.player_index]["surface_zoom_value_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+        storage.gui[event.player_index]["surface_zoom_label_" .. surface.name].visible = autoZoomToggle and surfaceToggle
         -- storage.gui[event.player_index]["surface_zoom_slider_" .. surface.name].enabled = (not autoZoomToggle) and surfaceToggle -- TODO:change this to showing the list
     end
     -- if autoZoomToggle then 
@@ -290,7 +293,7 @@ end
 
 function handlers.surface_zoom_toggle_click(event)
     local surfaceZoomToggle = event.element.state
-    surfacename = string.gsub(event.element.name,"surface_zoom_toggle_","")
+    local surfacename = string.gsub(event.element.name,"surface_zoom_toggle_","")
     storage.auto[event.player_index].surfaceZoomToggle[surfacename] = surfaceZoomToggle
     log(l.info((surfacename .. "surface zoom toggle was changed for player " .. event.player_index)))
     -- storage.auto[event.player_index].autoZoomToggle = autoZoomToggle
@@ -418,8 +421,10 @@ end
 function handlers.surface_zoom_slider_changed(event)
     log(l.info(event.element.name .. "was moved"))
     local level = event.element.slider_value
-    local surfacename = string.gsub(event.element.name,"surface_zoom_slider_","")
-    storage.gui[event.player_index]["surface_zoom_value_" .. surfacename].text = tostring(level)
+    -- local surfacename = string.gsub(event.element.name,"surface_zoom_slider_","")
+    local surfacename = event.element.caption
+    -- storage.gui[event.player_index]["surface_zoom_value_" .. surfacename].text = tostring(level)
+    storage.gui[event.player_index]["surface_zoom_label_" .. surfacename].caption = tostring(level)
     storage.auto[event.player_index].manualZoomLevel[surfacename] = level
     -- storage.auto[event.player_index].zoomLevel[surfacename] = level
     -- shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel

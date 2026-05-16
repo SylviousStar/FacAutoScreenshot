@@ -124,6 +124,7 @@ local function addListitem(index, list, surfacename)
     storage.gui[index]["surface_zoom_slider_" .. surfacename] = list_item.add {
         type = "slider",
         name = "surface_zoom_slider_" .. surfacename,
+        caption = tostring(storage.auto[index].zoomLevel[surfacename]),
         tooltip = { "FAS-auto-zoom-label-tooltip" },
         minimum_value = "1",
         maximum_value = "32",
@@ -132,16 +133,22 @@ local function addListitem(index, list, surfacename)
         enabled = storage.auto[index].surfaceZoomToggle[surfacename] or false,
         style = "fas_slider"
     }
-    storage.gui[index]["surface_zoom_value_" .. surfacename] = list_item.add {
-        type = "textfield",
-        name = "surface_zoom_value_" .. surfacename,
-        tooltip = { "FAS-auto-zoom-label-tooltip" },
-        text = tostring(storage.auto[index].zoomLevel[surfacename]),
-        numeric = "true",
-        allow_decimal = "true",
-        visible = storage.auto[index].autoZoomToggle and storage.auto[index].doSurface[surfacename],
-        enabled = "false",
-        style = "fas_slim_numeric_output"
+    -- storage.gui[index]["surface_zoom_value_" .. surfacename] = list_item.add {
+    --     type = "textfield",
+    --     name = "surface_zoom_value_" .. surfacename,
+    --     tooltip = { "FAS-auto-zoom-label-tooltip" },
+    --     text = tostring(storage.auto[index].zoomLevel[surfacename]),
+    --     numeric = "true",
+    --     allow_decimal = "true",
+    --     visible = storage.auto[index].autoZoomToggle and storage.auto[index].doSurface[surfacename],
+    --     enabled = "false",
+    --     style = "fas_slim_numeric_output"
+    -- }
+    storage.gui[index]["surface_zoom_label_" .. surfacename] = list_item.add {
+        type = "label",
+        name = "surface_zoom_label_" .. surfacename,
+        caption = tostring(storage.auto[index].zoomLevel[surfacename]),
+        visible = storage.auto[index].autoZoomToggle and storage.auto[index].doSurface[surfacename]
     }
 end
 

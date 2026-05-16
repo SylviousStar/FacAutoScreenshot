@@ -85,8 +85,9 @@ function shooter.evaluateZoomForPlayer(index, surface)
 
 	if storage.gui[index] then
 		-- Update gui to reflect latest auto zoom level, only runs if manual zoom is disabled
-		storage.gui[index]["surface_zoom_value_" .. surface].text = tostring(storage.auto[index].zoomLevel[surface]) -- TODO: Change this to lists
+		-- storage.gui[index]["surface_zoom_value_" .. surface].text = tostring(storage.auto[index].zoomLevel[surface])
 		storage.gui[index]["surface_zoom_slider_" .. surface].slider_value = storage.auto[index].zoomLevel[surface]
+		storage.gui[index]["surface_zoom_label_" .. surface].caption = tostring(storage.auto[index].zoomLevel[surface]) -- TODO: Change this to lists
 	end
 end
 

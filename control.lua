@@ -28,10 +28,22 @@ local function loadDefaultsForPlayer(index)
         l.info("storage.auto.autoZoomLevel was nil")
         storage.auto[index].autoZoomLevel = {}
     end
-    -- TODO: initialize manualZoomLevel list
+    if not storage.auto[index].surfaceZoomToggle then 
+        l.info("storage.auto.surfaceZoomToggle was nil")
+        storage.auto[index].surfaceZoomToggle = {}
+        -- for _, surface in pairs(game.surfaces) do
+        --     storage.auto[index].surfaceZoomToggle[surface.name] = false -- this needs to be initialized so autoZoomToggle works
+        --     -- log(l.info("surface zoom" .. surface.name .. ": " ..
+        --     -- (storage.auto[index].surfaceZoomToggle[surface.name] and "true" or "false")))
+        -- end
+    end
+    if not storage.auto[index].manualZoomLevel then
+        l.info("storage.auto.manualZoomLevel was nil")
+        storage.auto[index].manualZoomLevel = {}
+    end
 
-    if storage.auto[index].autoZoom == nil then storage.auto[index].autoZoom = true end
-    log(l.info("autoZoom is " .. (storage.auto[index].autoZoom and "on" or "off")))
+    if storage.auto[index].autoZoomToggle == nil then storage.auto[index].autoZoomToggle = false end
+    log(l.info("autoZoom is " .. (storage.auto[index].autoZoomToggle and "on" or "off")))
 
     -- if not storage.auto[index].autoZoomLevel then storage.auto[index].autoZoomLevel = 1 end
     -- log(l.info("storage.auto.autoZoomLevel is " .. storage.auto[index].autoZoomLevel))
@@ -55,10 +67,11 @@ local function loadDefaultsForPlayer(index)
 
     if not storage.auto[index].doSurface then storage.auto[index].doSurface = {} end
     for _, surface in pairs(game.surfaces) do
+        -- storage.auto[index].doSurface[surface.name] = false -- this needs to be initialized so autoZoomToggle works
         log(l.info("does surface " .. surface.name .. ": " ..
             (storage.auto[index].doSurface[surface.name] and "true" or "false")))
     end
-
+    
     if not storage.snip[index] then
         l.info("storage.snip was nil")
         storage.snip[index] = {}
@@ -238,10 +251,14 @@ function handlers.auto_content_collapse_click(event)
     gui.toggle_auto_content_area(event.player_index)
 end
 
--- TODO: have a list of zoom leveles for different surfaces
 function handlers.surface_checkbox_click(event)
     log(l.info("surface_checkbox was triggered for player " .. event.player_index))
     storage.auto[event.player_index].doSurface[event.element.caption] = event.element.state
+    
+    visible = storage.auto[event.player_index].autoZoomToggle and storage.auto[event.player_index].doSurface[event.element.caption]
+    storage.gui[event.player_index]["surface_zoom_toggle_" .. event.element.caption].visible = visible
+    storage.gui[event.player_index]["surface_zoom_slider_" .. event.element.caption].visible = visible
+    storage.gui[event.player_index]["surface_zoom_value_" .. event.element.caption].visible = visible
 
     if storage.auto[event.player_index].zoomLevel[event.element.caption] == nil then
         if l.doD then log(l.debug("Zoomlevel was nil when changing surface selection")) end
@@ -251,18 +268,66 @@ function handlers.surface_checkbox_click(event)
     gui.refreshStatusCountdown()
 end
 
-function handlers.auto_zoom_check_value_click(event)
-    log(l.info(("auto zoom check value was changed for player " .. event.player_index)))
-    local autoZoom = event.element.state
-    storage.auto[event.player_index].autoZoom = autoZoom
-    -- storage.gui[event.player_index].auto_zoom_flow.visible = not autoZoom
-    storage.gui[event.player_index].auto_zoom_slider.enabled = not autoZoom -- TODO:change this to showing the list
-    if autoZoom then 
+function handlers.auto_zoom_toggle_value_click(event)
+    log(l.info(("auto zoom toggle value was changed for player " .. event.player_index)))
+    local autoZoomToggle = event.element.state
+    storage.auto[event.player_index].autoZoomToggle = autoZoomToggle
+    -- storage.gui[event.player_index].auto_zoom_flow.visible = not autoZoomToggle
+    for _, surface in pairs(game.surfaces) do
+        surfaceToggle = storage.auto[event.player_index].doSurface[surface.name] or false
+        -- storage.gui[event.player_index]["surface_zoom_listitem_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+        storage.gui[event.player_index]["surface_zoom_toggle_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+        storage.gui[event.player_index]["surface_zoom_slider_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+        storage.gui[event.player_index]["surface_zoom_value_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+        -- storage.gui[event.player_index]["surface_zoom_slider_" .. surface.name].enabled = (not autoZoomToggle) and surfaceToggle -- TODO:change this to showing the list
+    end
+    -- if autoZoomToggle then 
+    --     if l.doD then log(l.debug("Reevaluating autoZoomLevel due to button click")) end
+    --     basetracker.checkForMinMaxChange() -- this is used as a condition below, but it simultaneously updates minmax so shooter can reevaluate
+    --     shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) 
+    -- end
+end
+
+function handlers.surface_zoom_toggle_click(event)
+    local surfaceZoomToggle = event.element.state
+    surfacename = string.gsub(event.element.name,"surface_zoom_toggle_","")
+    storage.auto[event.player_index].surfaceZoomToggle[surfacename] = surfaceZoomToggle
+    log(l.info((surfacename .. "surface zoom toggle was changed for player " .. event.player_index)))
+    -- storage.auto[event.player_index].autoZoomToggle = autoZoomToggle
+    -- storage.gui[event.player_index].auto_zoom_flow.visible = not autoZoomToggle
+    -- for _, surface in pairs(game.surfaces) do
+    --     surfaceToggle = storage.auto[event.player_index].doSurface[surface.name] or false
+    --     storage.gui[event.player_index]["surface_zoom_listitem_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+    --     -- storage.gui[event.player_index]["surface_zoom_slider_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+    --     -- storage.gui[event.player_index]["surface_zoom_value_" .. surface.name].visible = autoZoomToggle and surfaceToggle
+    --     -- storage.gui[event.player_index]["surface_zoom_slider_" .. surface.name].enabled = (not autoZoomToggle) and surfaceToggle -- TODO:change this to showing the list
+    -- end
+    storage.gui[event.player_index]["surface_zoom_slider_" .. surfacename].enabled = surfaceZoomToggle
+
+    if surfaceZoomToggle then
+        storage.auto[event.player_index].manualZoomLevel[surfacename] = storage.auto[event.player_index].zoomLevel[surfacename] -- set manualZoomLevel to the current zoom level
+        -- storage.auto[event.player_index].manualZoomLevel[surface] = nil
+    else
         if l.doD then log(l.debug("Reevaluating autoZoomLevel due to button click")) end
         basetracker.checkForMinMaxChange() -- this is used as a condition below, but it simultaneously updates minmax so shooter can reevaluate
-        shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) 
+        shooter.evaluateZoomForPlayer(event.player_index, surfacename) -- recalculate zoomLevel based on autoZoomLevel and update gui
+        -- autoZoomLevel does not need to be reset as it is never manually overridden
     end
 end
+
+
+-- function handlers.auto_zoom_check_value_click(event)
+--     log(l.info(("auto zoom check value was changed for player " .. event.player_index)))
+--     local autoZoom = event.element.state
+--     storage.auto[event.player_index].autoZoom = autoZoom
+--     -- storage.gui[event.player_index].auto_zoom_flow.visible = not autoZoom
+--     storage.gui[event.player_index].auto_zoom_slider.enabled = not autoZoom -- TODO:change this to showing the list
+--     if autoZoom then 
+--         if l.doD then log(l.debug("Reevaluating autoZoomLevel due to button click")) end
+--         basetracker.checkForMinMaxChange() -- this is used as a condition below, but it simultaneously updates minmax so shooter can reevaluate
+--         shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) 
+--     end
+-- end
 
 function handlers.single_tick_value_click(event)
     log(l.info(("single tick value was changed for player " .. event.player_index)))
@@ -341,13 +406,24 @@ end
 --  #endregion click handlers
 
 --  #region value changed handlers
-function handlers.auto_zoom_slider_value_changed(event)
-    log(l.info("auto zoom slider was moved"))
+-- function handlers.auto_zoom_slider_value_changed(event)
+--     log(l.info("auto zoom slider was moved"))
+--     local level = event.element.slider_value
+--     storage.gui[event.player_index].auto_zoom_value.text = tostring(level)
+--     -- storage.auto[event.player_index].manualZoomLevel = level
+--     storage.auto[event.player_index].zoomLevel["nauvis"] = level -- TODO: change this to a loop for each surface
+--     shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel
+-- end
+
+function handlers.surface_zoom_slider_changed(event)
+    log(l.info(event.element.name .. "was moved"))
     local level = event.element.slider_value
-    storage.gui[event.player_index].auto_zoom_value.text = tostring(level)
-    -- storage.auto[event.player_index].manualZoomLevel = level
-    storage.auto[event.player_index].zoomLevel["nauvis"] = level -- TODO: change this to a loop for each surface
-    shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel
+    local surfacename = string.gsub(event.element.name,"surface_zoom_slider_","")
+    storage.gui[event.player_index]["surface_zoom_value_" .. surfacename].text = tostring(level)
+    storage.auto[event.player_index].manualZoomLevel[surfacename] = level
+    -- storage.auto[event.player_index].zoomLevel[surfacename] = level
+    -- shooter.evaluateZoomForPlayerAndAllSurfaces(event.player_index) -- update zoom level using manualZoomLevel
+    shooter.evaluateZoomForPlayer(event.player_index, surfacename)
 end
 
 function handlers.splitting_factor_slider_value_changed(event)
@@ -454,6 +530,12 @@ local function callHandler(event, suffix)
 
     if string.find(event.element.name, "surface_checkbox") then
         handlerMethod = handlers["surface_checkbox_click"]
+    elseif string.find(event.element.name, "surface_zoom_slider") then
+        handlerMethod = handlers["surface_zoom_slider_changed"]
+    -- elseif string.find(event.element.name, "surface_zoom_value") then
+    --     handlerMethod = handlers["surface_zoom_value_changed"]
+    elseif string.find(event.element.name, "surface_zoom_toggle_") then
+        handlerMethod = handlers["surface_zoom_toggle_click"]
     else
         -- handler methods have to be called the same as the element that shall trigger them
         handlerMethod = handlers[event.element.name .. suffix]

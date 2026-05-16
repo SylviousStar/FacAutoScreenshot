@@ -3,7 +3,7 @@ local l = require("logger")
 local shooter = {}
 
 --[[ Zoom Evalutation ]] --
-local function evaluateZoomForPlayer(index, surface)
+function shooter.evaluateZoomForPlayer(index, surface)
 	--prevents a specific bug with rocket rush scenario
 	if storage.auto[index] == nil then
 		log(l.warn("storage.auto[" .. index .. "] is nil. returning"))
@@ -21,9 +21,10 @@ local function evaluateZoomForPlayer(index, surface)
 	if not storage.auto[index].zoom[surface] then storage.auto[index].zoom[surface] = 1 end
 	if not storage.auto[index].zoomLevel[surface] then storage.auto[index].zoomLevel[surface] = 1 end
 	-- if not storage.auto[index].autoZoom[surface] then storage.auto[index].autoZoom[surface] = 1 end
-	if not storage.auto[index].autoZoomLevel[surface] then storage.auto[index].autoZoomLevel[surface] = 1 end
+	if not storage.auto[index].autoZoomLevel[surface] then storage.auto[index].autoZoomLevel[surface] = storage.auto[index].zoomLevel[surface] end
+	if not storage.auto[index].manualZoomLevel[surface] then storage.auto[index].manualZoomLevel[surface] = storage.auto[index].zoomLevel[surface] end
 
-	if storage.auto[index].autoZoom then
+	if not storage.auto[index].surfaceZoomToggle[surfacename] then
 		-- restore auto zoom level if using auto zoom, should be same as zoom level unless manual zoom is activated
 		storage.auto[index].zoomLevel[surface] = storage.auto[index].autoZoomLevel[surface]
 		storage.auto[index].zoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
@@ -33,7 +34,7 @@ local function evaluateZoomForPlayer(index, surface)
 		surface ..
 		" to " .. storage.auto[index].zoom[surface] .. " and zoomlevel to " .. storage.auto[index].zoomLevel[surface]))
 	else 
-		-- storage.auto[index].zoomLevel[surface] = storage.auto[index].manualZoomLevel
+		storage.auto[index].zoomLevel[surface] = storage.auto[index].manualZoomLevel[surface]
 		storage.auto[index].zoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
 		log(l.info("Adjusting zoom for player " ..
 		index ..
@@ -76,7 +77,7 @@ local function evaluateZoomForPlayer(index, surface)
 		end
 	end
 
-	if storage.auto[index].autoZoom then
+	if not not storage.auto[index].surfaceZoomToggle[surfacename] then
 		-- store auto calculated zoom level to be retored if manual zoom is deactivated
 		storage.auto[index].autoZoomLevel[surface] = storage.auto[index].zoomLevel[surface]
 		-- storage.auto[index].autoZoom[surface] = 1 / storage.auto[index].zoomLevel[surface]
@@ -84,20 +85,20 @@ local function evaluateZoomForPlayer(index, surface)
 
 	if storage.gui[index] then
 		-- Update gui to reflect latest auto zoom level, only runs if manual zoom is disabled
-		storage.gui[index].auto_zoom_value.text = tostring(storage.auto[index].zoomLevel[surface]) -- TODO: Change this to lists
-		storage.gui[index].auto_zoom_slider.slider_value = storage.auto[index].zoomLevel[surface]
+		storage.gui[index]["surface_zoom_value_" .. surface].text = tostring(storage.auto[index].zoomLevel[surface]) -- TODO: Change this to lists
+		storage.gui[index]["surface_zoom_slider_" .. surface].slider_value = storage.auto[index].zoomLevel[surface]
 	end
 end
 
 function shooter.evaluateZoomForPlayerAndAllSurfaces(index)
 	for _, surface in pairs(game.surfaces) do
-		evaluateZoomForPlayer(index, surface.name)
+		shooter.evaluateZoomForPlayer(index, surface.name)
 	end
 end
 
 function shooter.evaluateZoomForAllPlayersAndSurface(surface)
 	for _, player in pairs(game.connected_players) do
-		evaluateZoomForPlayer(player.index, surface)
+		shooter.evaluateZoomForPlayer(player.index, surface)
 	end
 end
 

@@ -104,6 +104,45 @@ local function addListitem(index, list, surfacename)
         caption = surfacename,
         state = storage.auto[index].doSurface[surfacename] or false
     }
+
+    -- storage.gui[index]["surface_zoom_listitem_" .. surfacename] = list.add {
+    local list_item = list.add {
+        type = "flow",
+        name = "surface_zoom_listitem_" .. surfacename,
+        direction = "horizontal",
+        style = "fas_flow",
+        -- visible = storage.auto[index].autoZoomToggle,
+    }
+    -- local list_item = storage.gui[index]["surface_zoom_listitem_" .. surfacename]
+
+    storage.gui[index]["surface_zoom_toggle_" .. surfacename] = list_item.add {
+        type = "checkbox",
+        name = "surface_zoom_toggle_" .. surfacename,
+        visible = storage.auto[index].autoZoomToggle and storage.auto[index].doSurface[surfacename],
+        state = false
+    }
+    storage.gui[index]["surface_zoom_slider_" .. surfacename] = list_item.add {
+        type = "slider",
+        name = "surface_zoom_slider_" .. surfacename,
+        tooltip = { "FAS-auto-zoom-label-tooltip" },
+        minimum_value = "1",
+        maximum_value = "32",
+        value = storage.auto[index].zoomLevel[surfacename],
+        visible = storage.auto[index].autoZoomToggle and storage.auto[index].doSurface[surfacename],
+        enabled = storage.auto[index].surfaceZoomToggle[surfacename] or false,
+        style = "fas_slider"
+    }
+    storage.gui[index]["surface_zoom_value_" .. surfacename] = list_item.add {
+        type = "textfield",
+        name = "surface_zoom_value_" .. surfacename,
+        tooltip = { "FAS-auto-zoom-label-tooltip" },
+        text = tostring(storage.auto[index].zoomLevel[surfacename]),
+        numeric = "true",
+        allow_decimal = "true",
+        visible = storage.auto[index].autoZoomToggle and storage.auto[index].doSurface[surfacename],
+        enabled = "false",
+        style = "fas_slim_numeric_output"
+    }
 end
 
 local function buildAutoSurface(index, auto_content)
@@ -142,64 +181,64 @@ local function buildAutoSurface(index, auto_content)
     end
 end
 
-local function buildAutoZoomCheck(index, auto_screenshot_config)
-    local auto_zoom_check_flow = auto_screenshot_config.add{
+local function buildAutoZoomToggle(index, auto_screenshot_config)
+    local auto_zoom_toggle_flow = auto_screenshot_config.add{
         type = "flow",
-        name = "auto_zoom_check_flow",
+        name = "auto_zoom_toggle_flow",
         direction = "horizontal",
         style = "fas_flow"
     }
 
-    auto_zoom_check_flow.add{
+    auto_zoom_toggle_flow.add{
         type = "label",
-        name = "auto_zoom_check_label",
-        caption = {"FAS-auto-zoom-check-caption"},
+        name = "auto_zoom_toggle_label",
+        caption = {"FAS-auto-zoom-toggle-caption"},
         style = "fas_label"
     }
 
-    storage.gui[index].auto_zoom_check_value = auto_zoom_check_flow.add{
+    storage.gui[index].auto_zoom_toggle_value = auto_zoom_toggle_flow.add{
         type = "checkbox",
-        name = "auto_zoom_check_value",
-        state = storage.auto[index].autoZoom or false
+        name = "auto_zoom_toggle_value",
+        state = storage.auto[index].autoZoomToggle or false
     } -- TODO: Change this to say enable manual zoom levels, since each surface will have its own checkbox
 end
 
-local function buildAutoZoom(index, auto_screenshot_config)
-    local auto_zoom_flow = auto_screenshot_config.add{
-        type = "flow",
-        name = "auto_zoom_flow",
-        direction = "horizontal",
-        style = "fas_flow",
-        -- visible = not storage.auto[index].autoZoom
-    }
-    storage.gui[index].auto_zoom_flow = auto_zoom_flow
+-- local function buildAutoZoom(index, auto_screenshot_config)
+--     local auto_zoom_flow = auto_screenshot_config.add{
+--         type = "flow",
+--         name = "auto_zoom_flow",
+--         direction = "horizontal",
+--         style = "fas_flow",
+--         -- visible = not storage.auto[index].autoZoom
+--     }
+--     storage.gui[index].auto_zoom_flow = auto_zoom_flow
 
-    auto_zoom_flow.add{
-        type = "label",
-        name = "zoom_label",
-        caption = {"FAS-auto-zoom-label-caption"},
-        tooltip = {"FAS-auto-zoom-label-tooltip"},
-        style = "fas_label"
-    }
-    storage.gui[index].auto_zoom_slider = auto_zoom_flow.add{
-        type = "slider",
-        name = "auto_zoom_slider",
-        minimum_value = "1",
-        maximum_value = "32",
-        value = storage.auto[index].zoomLevel["nauvis"], -- TODO: Add a list for different surfaces
-        enabled = not storage.auto[index].autoZoom,
-        style = "fas_slider"
-    }
-    storage.gui[index].auto_zoom_value = auto_zoom_flow.add{
-        type = "textfield",
-        name = "auto_zoom_value",
-        text = tostring(storage.auto[index].zoomLevel["nauvis"]), -- TODO: Add a list for different surfaces
-        numeric = "true",
-        allow_decimal = "true",
-        enabled = "false",
-        style = "fas_slim_numeric_output"
-    }
-end
+--     auto_zoom_flow.add{
+--         type = "label",
+--         name = "zoom_label",
+--         caption = {"FAS-auto-zoom-label-caption"},
+--         tooltip = {"FAS-auto-zoom-label-tooltip"},
+--         style = "fas_label"
+--     }
+--     -- storage.gui[index].auto_zoom_slider = auto_zoom_flow.add{
+--     --     type = "slider",
+--     --     name = "auto_zoom_slider",
+--     --     minimum_value = "1",
+--     --     maximum_value = "32",
+--     --     value = storage.auto[index].zoomLevel["nauvis"], -- TODO: Add a list for different surfaces
+--     --     enabled = not storage.auto[index].autoZoom,
+--     --     style = "fas_slider"
+--     -- }
+--     -- storage.gui[index].auto_zoom_value = auto_zoom_flow.add{
+--     --     type = "textfield",
+--     --     name = "auto_zoom_value",
+--     --     text = tostring(storage.auto[index].zoomLevel["nauvis"]), -- TODO: Add a list for different surfaces
+--     --     numeric = "true",
+--     --     allow_decimal = "true",
+--     --     enabled = "false",
+--     --     style = "fas_slim_numeric_output"
+--     -- }
+-- end
 
 local function buildAutoResolution(index, auto_screenshot_config)
     local resolution_flow = auto_screenshot_config.add {
@@ -329,8 +368,8 @@ local function buildAutoScreenshotSection(index, auto_frame)
 
     buildAutoStatus(index, auto_content)
     buildAutoSurface(index, auto_content)
-    buildAutoZoomCheck(index, auto_content)
-    buildAutoZoom(index, auto_content)
+    buildAutoZoomToggle(index, auto_content)
+    -- buildAutoZoom(index, auto_content)
     buildAutoResolution(index, auto_content)
     buildAutoInterval(index, auto_content)
     buildAutoSingleTick(index, auto_content)
